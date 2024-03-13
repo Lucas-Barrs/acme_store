@@ -1,6 +1,6 @@
 const pg = require('pg');
 const client = new pg.Client(process.env.DATABASE_URL || 'postgres://localhost/acme_store');
-// const uuid = require('uuid');
+const uuid = require('uuid');
 
 const createTables = async ()=>{
   const SQL =`
@@ -24,9 +24,30 @@ const createTables = async ()=>{
   );
   `;
   await client.query(SQL);
-}
+};
+
+const createUser = async ({ username, password}) => {
+  const SQL = `
+    INSERT INTO users(id, username, password)
+    VALUES($1, $2, $3)
+    RETURNING *
+  `;
+  const response = await client.query(SQL, [uuid.v4(),username, password])
+  return response.rows[0];
+};
+
+const fetchUsers = async () => {
+  const SQL = `
+    SELECT *
+    FROM users
+  `;
+  const response = await client.query(SQL)
+  return response.rows;
+};
 
 module.exports = {
   client,
-  createTables
+  createTables,
+  createUser,
+  fetchUsers
 };
