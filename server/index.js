@@ -6,7 +6,8 @@ const {
   createProduct,
   fetchProducts,
   createFavorites,
-  fetchFavorites
+  fetchFavorites,
+  destroyFavorites
 } = require('./db');
 
 const init = async()=> {
@@ -30,8 +31,14 @@ const init = async()=> {
   console.log(joey.id);
   console.log(chocolate.id);
   await Promise.all([
-    createFavorites({ user_id: joey.id, product_id: chocolate.id})
+    createFavorites({ user_id: joey.id, product_id: chocolate.id}),
+    createFavorites({ user_id: ben.id, product_id: socks.id}),
+    createFavorites({ user_id: ro.id, product_id: socks.id}),
+    createFavorites({ user_id: cassi.id, product_id: socks.id}),
+    createFavorites({ user_id: cassi.id, product_id: cheese.id})
   ]);
+  console.log(await fetchFavorites(cassi.id));
+
 };
 
 init();

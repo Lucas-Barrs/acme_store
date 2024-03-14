@@ -76,7 +76,7 @@ const fetchProducts = async () => {
   return response.rows;
 };
 
-const fetchFavorites = async () => {
+const fetchFavorites = async (user_id) => {
   const SQL = `
     SELECT *
     FROM favorites
@@ -86,6 +86,20 @@ const fetchFavorites = async () => {
   return response.rows;
 };
 
+const destroyFavorites = async({ user_id, id}) => {
+  const SQL =`
+    DELETE FROM favorites
+    WHERE id = $1 AND user_id = $2
+    RETURNING *
+  `;
+  const response = await client.query(SQL, [id, user_id]);
+  if(!response.rows.length){
+    const error = Error('no favorite found');
+    error.status = 500;
+    throw error;
+  }
+}
+
 module.exports = {
   client,
   createTables,
@@ -94,5 +108,6 @@ module.exports = {
   createProduct,
   fetchProducts,
   createFavorites,
-  fetchFavorites
+  fetchFavorites,
+  destroyFavorites
 };
